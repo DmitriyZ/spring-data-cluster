@@ -13,6 +13,10 @@ public interface RegistratorRepository extends CrudRepository<Registrator, Long>
 
     List<Registrator> findByVersion(String version);
 
+    List<Registrator> findByOrderByIdAsc();
+
+    List<Registrator> findAllByOrderByIdDesc();
+
     List<Registrator> findRegistratorsByLastAuthDateBetween(Date from, Date to);
 
 }

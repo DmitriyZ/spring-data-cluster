@@ -6,10 +6,10 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.data.redis.connection.RedisConnection;
 import org.springframework.data.redis.core.RedisOperations;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.util.StopWatch;
 import ru.home.data.redis.entities.Registrator;
 import ru.home.data.redis.perository.RegistratorRepository;
 
@@ -23,44 +23,43 @@ import static org.junit.Assert.assertThat;
 @RunWith(SpringRunner.class)
 @SpringBootTest
 @TestPropertySource(locations = "classpath:application.properties")
-public class AppTests<K, V> {
+public class PerformanceTest300k<K, V> {
 
     @Autowired
     RedisOperations<K, V> operations;
     @Autowired
     RegistratorRepository repository;
 
+    @Test
+    public void contextLoads() {
+        long i = flushTestRegistrators();
+        StopWatch sw = new StopWatch();
+        sw.start("findall");
+        Iterable<Registrator> all = repository.findAll();
+        if (all != null) {
+            System.out.println("not jvm optimize");
+        }
+        sw.stop();
+        sw.start("repository count");
+        assertThat(repository.count(), is(i));
+        sw.stop();
+        System.out.println(sw.prettyPrint());
+    }
+
     @Before
     @After
     public void setUp() {
-        operations.execute((RedisConnection connection) -> {
-            connection.flushDb();
-            return "OK";
-        });
+//        operations.execute((RedisConnection connection) -> {
+//            connection.flushDb();
+//            return "OK";
+//        });
     }
-
-    @Test
-    public void findAll() {
-        long i = flushTestRegistrators();
-        Iterable<Registrator> all = repository.findAll();
-        all.forEach(System.out::println);
-        assertThat(repository.count(), is(i));
-    }
-
-    @Test
-    public void sortByIdRegistrator() {
-        flushTestRegistrators();
-        List<Registrator> byOrderByIdAsc = repository.findByOrderByIdAsc();
-        byOrderByIdAsc.forEach(System.out::println);
-        List<Registrator> byOrderByIdDesc = repository.findAllByOrderByIdDesc();
-        byOrderByIdDesc.forEach(System.out::println);
-    }
-
-
 
 
     private int flushTestRegistrators() {
         int capacity = 10;
+        StopWatch stopWatch = new StopWatch();
+        stopWatch.start("create registrators");
         List<Registrator> registrators = new ArrayList<>(capacity);
         for (int i = 0; i < capacity; i++) {
             registrators.add(Registrator.builder()
@@ -72,7 +71,12 @@ public class AppTests<K, V> {
                     .settings(new byte[]{(byte) i, (byte) 0xff}).build()
             );
         }
+        stopWatch.stop();
+
+        stopWatch.start("save in redis " + capacity + " registrators");
         repository.save(registrators);
+        stopWatch.stop();
+        System.out.println(stopWatch.prettyPrint());
         return registrators.size();
     }
 }
