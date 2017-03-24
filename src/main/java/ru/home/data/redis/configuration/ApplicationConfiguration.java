@@ -1,9 +1,9 @@
 package ru.home.data.redis.configuration;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
-import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.repository.configuration.EnableRedisRepositories;
 
@@ -13,14 +13,7 @@ import org.springframework.data.redis.repository.configuration.EnableRedisReposi
 @Configuration
 @EnableRedisRepositories
 public class ApplicationConfiguration {
-    @Bean
-    RedisConnectionFactory connectionFactory() {
-        JedisConnectionFactory jedisConnectionFactory = new JedisConnectionFactory();
-        //TODO: need from config
-        jedisConnectionFactory.setHostName("192.168.99.100");
-        return jedisConnectionFactory;
-    }
-
+    @Autowired
     @Bean
     RedisTemplate<?, ?> redisTemplate(RedisConnectionFactory connectionFactory) {
 
