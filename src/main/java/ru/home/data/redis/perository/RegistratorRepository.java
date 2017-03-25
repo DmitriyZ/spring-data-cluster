@@ -3,7 +3,6 @@ package ru.home.data.redis.perository;
 import org.springframework.data.repository.CrudRepository;
 import ru.home.data.redis.entities.Registrator;
 
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -17,6 +16,6 @@ public interface RegistratorRepository extends CrudRepository<Registrator, Long>
 
     List<Registrator> findAllByOrderByIdDesc();
 
-    List<Registrator> findRegistratorsByLastAuthDateBetween(Date from, Date to);
+    List<Registrator> findAllByLastMessageId(int from, int to);
 
 }

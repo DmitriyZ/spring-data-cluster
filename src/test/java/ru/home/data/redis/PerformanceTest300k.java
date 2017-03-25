@@ -6,6 +6,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.redis.connection.RedisConnection;
 import org.springframework.data.redis.core.RedisOperations;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -49,15 +50,15 @@ public class PerformanceTest300k<K, V> {
     @Before
     @After
     public void setUp() {
-//        operations.execute((RedisConnection connection) -> {
-//            connection.flushDb();
-//            return "OK";
-//        });
+        operations.execute((RedisConnection connection) -> {
+            connection.flushDb();
+            return "OK";
+        });
     }
 
 
     private int flushTestRegistrators() {
-        int capacity = 10;
+        int capacity = 10000;
         StopWatch stopWatch = new StopWatch();
         stopWatch.start("create registrators");
         List<Registrator> registrators = new ArrayList<>(capacity);

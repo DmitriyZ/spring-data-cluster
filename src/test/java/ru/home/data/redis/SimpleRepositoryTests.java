@@ -23,7 +23,7 @@ import static org.junit.Assert.assertThat;
 @RunWith(SpringRunner.class)
 @SpringBootTest
 @TestPropertySource(locations = "classpath:application.properties")
-public class AppTests<K, V> {
+public class SimpleRepositoryTests<K, V> {
 
     @Autowired
     RedisOperations<K, V> operations;
@@ -56,6 +56,14 @@ public class AppTests<K, V> {
         byOrderByIdDesc.forEach(System.out::println);
     }
 
+    @Test
+    public void getBetweenLastMessageId() {
+        System.out.println("test getBetweenLastMessageId");
+        flushTestRegistrators();
+        final List<Registrator> registratorsByLastMessageId = repository.findAllByLastMessageId(50000003, 50000006);
+        registratorsByLastMessageId.forEach(System.out::println);
+    }
+
 
 
 
@@ -67,7 +75,7 @@ public class AppTests<K, V> {
                     .id((long) (10000000 + i))
                     .version(i % 10)
                     .lastMessageId(50000000 + i)
-                    .lastAuthDate(new Date(new Date().getTime() + i * 10 * 1000))
+                    .lastAuthDate(new Date(i))
                     .allDataSended(i % 2 != 0)
                     .settings(new byte[]{(byte) i, (byte) 0xff}).build()
             );
