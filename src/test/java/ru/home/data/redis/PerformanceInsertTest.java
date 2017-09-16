@@ -12,8 +12,10 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.util.StopWatch;
 import ru.home.data.redis.entities.Registrator;
-import ru.home.data.redis.perository.RegistratorRepository;
+import ru.home.data.redis.repository.RegistratorRepository;
 
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -24,7 +26,7 @@ import static org.junit.Assert.assertThat;
 @RunWith(SpringRunner.class)
 @SpringBootTest
 @TestPropertySource(locations = "classpath:application.properties")
-public class PerformanceTest300k<K, V> {
+public class PerformanceInsertTest<K, V> {
 
     @Autowired
     RedisOperations<K, V> operations;
@@ -58,7 +60,7 @@ public class PerformanceTest300k<K, V> {
 
 
     private int flushTestRegistrators() {
-        int capacity = 10000;
+        int capacity = 1000;
         StopWatch stopWatch = new StopWatch();
         stopWatch.start("create registrators");
         List<Registrator> registrators = new ArrayList<>(capacity);
@@ -74,10 +76,16 @@ public class PerformanceTest300k<K, V> {
         }
         stopWatch.stop();
 
-        stopWatch.start("save in redis " + capacity + " registrators");
+        stopWatch.start("try save in redis " + capacity + " registrators");
         repository.save(registrators);
         stopWatch.stop();
         System.out.println(stopWatch.prettyPrint());
+
+        StopWatch.TaskInfo lastTaskInfo = stopWatch.getLastTaskInfo();
+        NumberFormat formatter = new DecimalFormat("#0.000");
+        System.out.println("Mean save time: " + formatter.format(capacity  * 1000.0 / lastTaskInfo.getTimeMillis()) + " msg/sec");
+        System.out.println();
+
         return registrators.size();
     }
 }

@@ -2,7 +2,6 @@ package ru.home.data.redis.entities;
 
 import lombok.Builder;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.redis.core.RedisHash;
@@ -15,8 +14,7 @@ import java.util.Date;
  */
 @Data
 @Builder
-@EqualsAndHashCode
-@RedisHash("registrator")
+@RedisHash("registrators")
 @NoArgsConstructor
 public class Registrator {
 
